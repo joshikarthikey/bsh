@@ -91,9 +91,9 @@ _bsh_refresh_suggestions() {
 
         _bsh_suggestions[$i]="$line"
         
-        # Format: " ⌥1: command "
+        # Format: "1: command "
         local display_num=$((i + 1))
-        local text=" ⌥$display_num: $line"
+        local text=" $display_num: $line"
         
         # Calculate visual length (strip ANSI codes if any exist)
         local clean_text=${text//$'\e'[\[(]*([0-9;])[@-~]/}
@@ -104,6 +104,8 @@ _bsh_refresh_suggestions() {
         display_lines+=("$text")
         ((i++))
     done <<< "$output"
+
+    max_len=$((max_len + 4))
 
     # If no valid lines found after parsing
     if [[ ${#display_lines[@]} -eq 0 ]]; then
