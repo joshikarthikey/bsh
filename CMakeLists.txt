@@ -22,15 +22,28 @@ find_package(PkgConfig REQUIRED)
 # "IMPORTED_TARGET" automatically handles include/lib paths for us
 pkg_check_modules(LIBGIT2 REQUIRED IMPORTED_TARGET libgit2) 
 
+# 3. FTXUI (The Interface) ---
+FetchContent_Declare(
+  ftxui
+  GIT_REPOSITORY https://github.com/ArthurSonzogni/FTXUI.git
+  GIT_TAG        v5.0.0
+)
+FetchContent_MakeAvailable(ftxui)
+
 # --- Build the Executable ---
 add_executable(bsh 
     src/main.cpp 
     src/db.cpp
     src/git_utils.cpp 
+    src/tui.cpp
 )
 
 # --- Link Libraries ---
 target_link_libraries(bsh 
     PRIVATE 
     SQLiteCpp 
-    PkgConfig::LIBGIT2 )
+    PkgConfig::LIBGIT2
+    ftxui::screen
+    ftxui::dom
+    ftxui::component
+)

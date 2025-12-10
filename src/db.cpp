@@ -1,4 +1,5 @@
 #include "db.hpp"
+#include <iostream>
 
 HistoryDB::HistoryDB(const std::string& db_path) : db_path_(db_path) {}
 
@@ -64,4 +65,49 @@ void HistoryDB::logCommand(const std::string& cmd, const std::string& session,
     } catch (std::exception& e) {
         std::cerr << "Log Error: " << e.what() << std::endl;
     }
+}
+
+std::vector<SearchResult> HistoryDB::search(const std::string& query, const std::string& cwd_filter) {
+    std::vector<SearchResult> results;
+    try {
+        SQLite::Database db(db_path_, SQLite::OPEN_READONLY);
+        
+        // Basic query: Join executions with commands
+        // We prioritize recent commands (ORDER BY id DESC)
+        std::string sql = R"(
+            SELECT e.id, c.cmd_text, e.git_branch, e.timestamp
+            FROM executions e
+            JOIN commands c ON e.command_id = c.id
+            WHERE c.cmd_text LIKE ? 
+        )";
+
+        // Optional: Filter by directory if requested
+        if (!cwd_filter.empty()) {
+            sql += " AND e.cwd = ? ";
+        }
+
+        sql += " ORDER BY e.id DESC LIMIT 50";
+
+        SQLite::Statement q(db, sql);
+        
+        // Bind parameters
+        q.bind(1, "%" + query + "%");
+        if (!cwd_filter.empty()) {
+            q.bind(2, cwd_filter);
+        }
+
+        while (q.executeStep()) {
+            SearchResult res;
+            res.id = q.getColumn(0);
+            res.cmd = q.getColumn(1).getString();
+            // Handle null branch safely
+            res.branch = q.getColumn(2).isNull() ? "" : q.getColumn(2).getString();
+            res.timestamp = q.getColumn(3);
+            results.push_back(res);
+        }
+
+    } catch (std::exception& e) {
+        std::cerr << "Search Error: " << e.what() << std::endl;
+    }
+    return results;
 }

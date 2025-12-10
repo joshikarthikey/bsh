@@ -1,5 +1,6 @@
 #include "db.hpp"
 #include "git_utils.hpp"
+#include "tui.hpp"
 #include <iostream>
 #include <filesystem>
 #include <cstdlib>
@@ -45,7 +46,7 @@ int main(int argc, char* argv[]) {
         
         if (cmd.empty()) return 1; // Nothing to record
 
-        // 3. Resolve Git Branch (using our new libgit2 util)
+        // 3. Resolve Git Branch
         // If cwd is not provided, use current process path
         if (cwd.empty()) cwd = fs::current_path().string();
         
@@ -60,9 +61,15 @@ int main(int argc, char* argv[]) {
         int duration = duration_str.empty() ? 0 : std::stoi(duration_str);
 
         history.logCommand(cmd, session, cwd, branch, exit_code, duration);
+    }
+
+    else if (mode == "search") {
+        std::string selection = run_search_ui(history);
         
-        // Debug output (optional)
-        // std::cout << "Recorded: " << cmd << " [" << branch << "]\n";
+        // Print selected command to stdout so the shell can capture it
+        if (!selection.empty()) {
+            std::cout << selection; 
+        }
     }
 
     return 0;
