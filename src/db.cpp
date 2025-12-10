@@ -72,7 +72,7 @@ void HistoryDB::logCommand(const std::string& cmd, const std::string& session,
         else logQuery.bind(4, branch);
         logQuery.bind(5, exit_code);
         logQuery.bind(6, duration);
-        logQuery.bind(7, timestamp);
+        logQuery.bind(7, (int64_t)timestamp);
         logQuery.exec();
 
     } catch (std::exception& e) {

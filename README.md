@@ -19,10 +19,22 @@ Standard shell history mechanisms (Bash/Zsh) suffer from three critical limitati
 3.  **Pollution:** Failed commands (typos or non-zero exit codes) clutter search results, reducing efficiency.
 
 ---
+## 3. Usage & Controls
 
-## 3. Technical Architecture
+The BSH TUI provides the following interaction modes:
 
-### 3.1 Technology Stack
+| Key Binding | Action |
+| :--- | :--- |
+| **`Enter`** | Executes the user typed command. |
+| **`Alt`/`Option` + `1-5`** | Instantly executes the corresponding suggestion from the Top 10 list. |
+| **`Alt`/`Option` + `Arrows`** | Cycles search context: **Global** $\leftrightarrow$ **Directory** $\leftrightarrow$ **Git Branch**. |
+| **`Ctrl` + `F`** | **Toggle Success Filter**: Show/hide failed commands (Exit code ≠ 0). |
+
+---
+
+## 4. Technical Architecture
+
+### 4.1 Technology Stack
 BSH is engineered for minimal latency (<5ms) using Modern C++ to ensure compliance with performance-critical CLI environments.
 
 | Component | Library/Tool | Justification |
@@ -33,7 +45,7 @@ BSH is engineered for minimal latency (<5ms) using Modern C++ to ensure complian
 | **TUI Renderer** | FTXUI | Rendering the "Live Prediction" overlay. |
 | **Context Utils** | libgit2 | Efficient resolution of Git branch context. |
 
-### 3.2 Data Model
+### 4.2 Data Model
 BSH utilizes a relational schema to optimize storage and query performance.
 
 * **`commands` Table:** Stores unique command strings to prevent redundancy.
@@ -46,10 +58,10 @@ BSH utilizes a relational schema to optimize storage and query performance.
 
 ---
 
-## 4. Key Features
+## 5. Key Features
 
 ### Live Predictive TUI
-Integrated via the Zsh Line Editor (ZLE), BSH intercepts keystrokes to display a "Top 10" relevance list below the cursor in real-time.
+Integrated via the Zsh Line Editor (ZLE), BSH intercepts keystrokes to display a "Top 5" relevance list below the cursor in real-time.
 
 ### Deep Git Integration
 BSH treats Git branches as distinct contexts. Users can filter history specifically by the current branch, solving the "Context Blindness" issue inherent in flat files.
@@ -62,31 +74,58 @@ BSH operates with 100% local execution using C++ and SQLite. No data is transmit
 
 ---
 
-## 5. Usage & Controls
+## 6. Build Instructions
 
-The BSH TUI provides the following interaction modes:
+### Prerequisites and Dependencies
 
-| Key Binding | Action |
+To build BSH, you need a standard C++ development environment and the core system libraries that `libgit2` and `SQLiteCpp` link against.
+
+#### Core Build Tools (Required)
+
+| Tool | Minimum Version | Description |
+| :--- | :--- | :--- |
+| **C++ Compiler** | GCC 9+ or Clang 10+ | Required for compiling the C++ source code. |
+| **CMake** | 3.15+ | Required for configuring the build system and managing dependencies (FetchContent). |
+| **Zsh** | N/A | Required for the interactive shell integration (`bsh_init.zsh` script). |
+
+#### System Libraries (Required for Linking)
+
+| Library | Purpose |
 | :--- | :--- |
-| **`Enter`** | Executes the Top (0th) suggestion or the current buffer if selected. |
-| **`Alt` + `0-9`** | Instantly executes the corresponding suggestion from the Top 10 list. |
-| **`Ctrl` + `Arrows`** | Cycles search context: **Global** $\leftrightarrow$ **Directory** $\leftrightarrow$ **Git Branch**. |
-| **`Alt` + `S`** | **Toggle Success Filter**: Show/hide failed commands (Exit code ≠ 0). |
+| **`libsqlite3`** | Local database management for history. |
+| **`zlib`** | Compression/decompression for Git objects (used by libgit2). |
+| **`libssl`/`libcrypto`** | Secure hashing and HTTPS connectivity (used by libgit2). |
 
 ---
 
-## 6. Build Instructions
+#### Installation via Package Managers
 
-### Prerequisites
-* C++ Compiler (GCC 9+ or Clang 10+)
-* CMake (3.15+)
-* Dependencies: `libsqlite3`, `libgit2`
+Use your system's package manager to install the required development libraries before running the `./install.sh` script.
+
+#### macOS (using Homebrew)
+
+```bash
+brew install cmake libgit2 sqlite zlib openssl
+```
+
+
+#### Fedora/CentOS/RHEL (using DNF)
+
+```Bash
+
+sudo dnf install gcc-c++ make cmake libgit2-devel sqlite-devel zlib-devel openssl-devel
+```
 
 ### Installation
+
+Once prerequisites are installed, proceed to the installation section and run the ./install.sh script.
+
 ```bash
-git clone [https://github.com/username/bsh.git](https://github.com/username/bsh.git)
+# Clone the repository
+git clone https://github.com/joshikarthikey/bsh.git
 cd bsh
-mkdir build && cd build
-cmake ..
-make
-sudo make install
+
+# Grant execute permission and run the installer
+chmod +x install.sh
+./install.sh 
+```
