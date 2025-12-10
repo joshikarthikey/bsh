@@ -42,11 +42,10 @@ cp "$ZSH_INIT_FILE" "$INSTALL_DIR/scripts/"
 # --- 4. Update Zsh Configuration ---
 echo "Updating $ZSHRC_PATH..."
 
-INIT_LINE="source $INSTALL_DIR/scripts/bsh_init.zsh"
-# Check if the line already exists
+INIT_LINE="source $PWD/$ZSH_INIT_FILE"
+
 if ! grep -q "$INIT_LINE" "$ZSHRC_PATH"; then
     echo "\n# BSH History Integration (Added by install.sh)" >> "$ZSHRC_PATH"
-    echo "export BSH_BINARY=\"$BIN_PATH/$BINARY_NAME\"" >> "$ZSHRC_PATH"
     echo "$INIT_LINE" >> "$ZSHRC_PATH"
     echo "Success! Please run 'source $ZSHRC_PATH' or restart your terminal."
 else

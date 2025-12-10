@@ -1,6 +1,9 @@
 # scripts/bsh_init.zsh
 
-BSH_BINARY="$HOME/bsh/build/bsh"
+local BSH_INIT_SCRIPT_PATH="${(%):-%N}"
+export BSH_REPO_ROOT="$(dirname $(dirname $BSH_INIT_SCRIPT_PATH))"
+
+export BSH_BINARY="$BSH_REPO_ROOT/build/bsh"
 
 # State Variables
 typeset -gA _bsh_suggestions
