@@ -85,6 +85,17 @@ _bsh_refresh_suggestions() {
     local max_len=${#header_text}
     local i=0
     
+    # Determine Terminal Width constraints
+    # Fallback to 80 if COLUMNS is unset
+    local term_width=${COLUMNS:-80}
+    
+    # MATH FIX:
+    # Width = (Text Length) + 4 (Padding) + 2 (Borders │...│)
+    # Total Width <= COLUMNS
+    # Text Length <= COLUMNS - 6
+    # We use -7 for an extra safety buffer.
+    local safe_text_limit=$((term_width - 7)) 
+
     # Read output line by line
     while IFS= read -r line; do
         # Ignore empty lines
@@ -98,6 +109,13 @@ _bsh_refresh_suggestions() {
         local display_num=$((i + 1))
         local text=" $display_num: $line"
         
+        # --- TRUNCATION LOGIC ---
+        # If the text is wider than the safe limit, truncate and add "..."
+        if (( ${#text} > safe_text_limit )); then
+            # Truncate to limit - 3 to make room for "..."
+            text="${text:0:$((safe_text_limit - 3))}..."
+        fi
+
         # Calculate visual length (strip ANSI codes if any exist)
         local clean_text=${text//$'\e'[\[(]*([0-9;])[@-~]/}
         local text_len=${#clean_text}
@@ -108,6 +126,7 @@ _bsh_refresh_suggestions() {
         ((i++))
     done <<< "$output"
 
+    # Add the visual padding (this is where the extra width comes from)
     max_len=$((max_len + 4))
 
     # If no valid lines found after parsing
