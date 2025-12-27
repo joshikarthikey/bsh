@@ -67,7 +67,7 @@ The provided install.sh script compiles the binaries (Client and Daemon), sets u
 
 ```bash
 # 1. Clone the repository
-git clone [https://github.com/joshikarthikey/bsh.git](https://github.com/joshikarthikey/bsh.git)
+git clone https://github.com/joshikarthikey/bsh.git
 cd bsh
 
 # 2. Execute the installer
