@@ -93,7 +93,6 @@ int main(int argc, char* argv[]) {
         try {
             std::string command = args[0];
 
-            // --- HANDLER: SUGGEST ---
             if (command == "SUGGEST" && args.size() >= 5) {
                 std::string query = args[1];
                 std::string scope_str = args[2];
@@ -106,18 +105,19 @@ int main(int argc, char* argv[]) {
                 if (scope_str == "branch") {
                     scope = SearchScope::BRANCH;
                     
-                    // --- FIX START ---
-                    // The Client (via Zsh) has ALREADY resolved the branch name.
-                    // ctx_val contains "main", "feature/login", or "unknown".
+                    // 1. Resolve branch from CWD
+                    auto branch_opt = get_git_branch(ctx_val);
                     
-                    // We DO NOT call get_git_branch(ctx_val) here, because ctx_val 
-                    // is a name, not a directory path.
-                    
-                    // Normalize "unknown" to empty string for the DB query
-                    if (ctx_val == "unknown") {
+                    if (branch_opt) {
+                        ctx_val = *branch_opt;
+                        // --- PROTOCOL CHANGE ---
+                        // Send the resolved branch name back to the client
+                        // so the UI can display "BSH: Branch (main)"
+                        response += "##BRANCH:" + ctx_val + "\n";
+                    } else {
                         ctx_val = "";
+                        response += "##BRANCH:unknown\n";
                     }
-                    // --- FIX END ---
                 }
 
                 auto results = history.search(query, scope, ctx_val, success);
@@ -125,8 +125,6 @@ int main(int argc, char* argv[]) {
                     response += r.cmd + "\n";
                 }
             }
-
-            // --- HANDLER: RECORD ---
             else if (command == "RECORD" && args.size() >= 6) {
                 std::string cmd = args[1];
                 std::string sess = args[2];
@@ -134,7 +132,6 @@ int main(int argc, char* argv[]) {
                 int exit_code = (args[4].empty()) ? 0 : std::stoi(args[4]);
                 int duration = (args[5].empty()) ? 0 : std::stoi(args[5]);
                 
-                // For RECORD, we DO need to resolve the branch from the CWD
                 std::string branch = "";
                 auto branch_opt = get_git_branch(cwd);
                 if (branch_opt) branch = *branch_opt;
