@@ -146,23 +146,23 @@ To cleanly remove BSH:
 
 1. **Remove Files:**
 
-```Bash
-rm -rf ~/.bsh
-```
+    ```Bash
+    rm -rf ~/.bsh
+    ```
 
 2. **Clean Configuration:** Open `~/.zshrc` and remove the integration block:
 
-```Bash
-# BSH History Integration (Added by install.sh)
-source /home/<user>/.bsh/scripts/bsh_init.zsh
-```
+    ```Bash
+    # BSH History Integration (Added by install.sh)
+    source /home/<user>/.bsh/scripts/bsh_init.zsh
+    ```
 
 3. Reset Session: Restart your terminal. If errors persist (e.g., `command not found: _bsh_precmd`), run:
 
-```Bash
-precmd_functions=( ${precmd_functions[(I)_bsh_precmd]} )
-unfunction _bsh_toggle_success_filter
-```
+    ```Bash
+    precmd_functions=( ${precmd_functions[(I)_bsh_precmd]} )
+    unfunction _bsh_toggle_success_filter
+    ```
 
 ### 7.3 Apply Changes
 
