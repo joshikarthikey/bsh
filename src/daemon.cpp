@@ -121,8 +121,8 @@ int main(int argc, char* argv[]) {
                         response += "##BRANCH:" + ctx_val + "\n";
                     } 
                     else {
-                        scope = SearchScope::DIRECTORY;
-                        response += "##SCOPE:DIRECTORY\n";
+                        ctx_val = "";
+                        response += "##BRANCH:unknown\n";
                     }
                 }
 
