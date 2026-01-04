@@ -92,7 +92,8 @@ The BSH TUI activates automatically upon typing.
 | Key Binding | Action |
 | :--- | :--- |
 | **`Enter`** | Executes the user typed command. |
-| **`Alt`/`Option` + `1-5`** | Instantly executes the corresponding suggestion from the Top 10 list. |
+| **`Alt`/`Option` + `1-5`** | Instantly executes the corresponding suggestion from the Top 5 list. |
+| **`Alt`/`Option` + `Shift` + `1-5`** | Pastes the corresponding suggestion from the Top 5 list without executing it. |
 | **`Alt`/`Option` + `Arrows`** | Cycles search context: **Global** $\leftrightarrow$ **Directory** $\leftrightarrow$ **Git Branch**. |
 | **`Ctrl` + `F`** | **Toggle Success Filter**: Show/hide failed commands (Exit code ≠ 0). |
 
